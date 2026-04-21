@@ -13,9 +13,6 @@
             --text: #2d3436;
             --school-color: #74b9ff;
             --home-color: #55efc4;
-            --kitchen-color: #fab1a0; 
-            --laundry-color: #81ecec; 
-            --sweep-color: #ffeaa7;   
             --danger: #ff4757;
             --border-width: 3px;
         }
@@ -36,13 +33,72 @@
             100% { opacity: 1; transform: scale(1); }
         }
 
+        /* --- LAYOUT DO TOPO --- */
+        .top-bar {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            margin-top: 10px;
+        }
+
+        /* --- ANÚNCIO PREMIUM --- */
+        .premium-ad-banner {
+            background: linear-gradient(-45deg, #6c5ce7, #a29bfe, #fd79a8, #6c5ce7);
+            background-size: 400% 400%;
+            animation: gradientBG 8s ease infinite;
+            border: 3px solid #000;
+            border-radius: 20px;
+            padding: 12px;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: white;
+            box-shadow: 0 5px 0 #000;
+            cursor: pointer;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .ad-content h4 { font-size: 0.8rem; text-transform: uppercase; }
+        .ad-content p { font-size: 0.65rem; opacity: 0.9; line-height: 1.1; }
+
+        .ad-btn {
+            background: #ffeaa7;
+            color: #000;
+            border: 2px solid #000;
+            padding: 6px 10px;
+            border-radius: 10px;
+            font-size: 0.65rem;
+            font-weight: 900;
+            animation: pulseBtn 1.5s infinite;
+        }
+
+        @keyframes pulseBtn {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
         /* --- CONFIGURAÇÕES --- */
         #settings-btn {
-            position: fixed; top: 20px; right: 20px; z-index: 999;
-            background: var(--white); border: 3px solid #000; border-radius: 50%;
-            width: 50px; height: 50px; font-size: 25px; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: 4px 4px 0 #000;
+            background: var(--white); 
+            border: 3px solid #000; 
+            border-radius: 15px;
+            width: 50px; 
+            height: 50px; 
+            font-size: 22px; 
+            cursor: pointer;
+            display: none;
+            align-items: center; 
+            justify-content: center;
+            box-shadow: 0 5px 0 #000;
+            flex-shrink: 0;
         }
 
         #settings-panel {
@@ -105,6 +161,12 @@
             cursor: pointer; box-shadow: 0px 6px 0px #3d348b; text-transform: uppercase;
         }
 
+        .btn-back {
+            background: #dfe6e9; color: #2d3436; border: 3px solid #000;
+            padding: 12px; border-radius: 20px; font-weight: 900; margin-top: 15px;
+            width: 100%; cursor: pointer; box-shadow: 0 4px 0 #000;
+        }
+
         .filter-tabs { display: flex; gap: 12px; margin-bottom: 30px; overflow-x: auto; padding: 5px 5px 15px 5px; scrollbar-width: none; }
         .tab-btn {
             flex: 0 0 auto; padding: 12px 20px; border: var(--border-width) solid var(--text);
@@ -123,9 +185,6 @@
         .category-dot { width: 20px; height: 20px; border-radius: 6px; border: 2px solid var(--text); }
         .dot-school { background: var(--school-color); }
         .dot-home { background: var(--home-color); }
-        .dot-kitchen { background: var(--kitchen-color); }
-        .dot-laundry { background: var(--laundry-color); }
-        .dot-sweep { background: var(--sweep-color); }
         .completed { background: #eee !important; opacity: 0.6; }
         .completed span { text-decoration: line-through; }
         .delete-btn { background: var(--secondary); color: white; border: 2px solid var(--text); padding: 8px 12px; border-radius: 10px; font-weight: bold; }
@@ -134,15 +193,14 @@
             position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
             background: var(--danger); color: white; padding: 15px 25px;
             border-radius: 20px; border: 3px solid #000; font-weight: 900;
-            z-index: 1000; display: none; box-shadow: 0 10px 0px #000;
+            z-index: 30000; display: none; box-shadow: 0 10px 0px #000;
+            text-align: center;
         }
     </style>
 </head>
 <body>
 
-    <div id="alert-popup">🔔 HORA DA TAREFA!</div>
-
-    <button id="settings-btn" onclick="toggleSettings(); playPop();" style="display: none;">⚙️</button>
+    <div id="alert-popup">🔔 HORA DA TAREFA!<br><span id="alert-task-name" style="font-size: 0.8rem; opacity: 0.9;"></span></div>
 
     <div id="settings-panel">
         <h2 style="text-align: center;">AJUSTES 🛠️</h2>
@@ -177,13 +235,14 @@
 
     <div id="paywall-screen">
         <div class="pay-card">
-            <h1 style="font-size: 3rem;">🛑 OPS!</h1>
-            <p style="margin: 20px 0; font-weight: 800;">Seu teste grátis de 3 dias acabou.</p>
-            <div style="background: #ffeaa7; padding: 15px; border-radius: 15px; border: 3px solid #000; margin-bottom: 20px;">
+            <h1 id="paywall-title" style="font-size: 2.2rem;">APOIAR PROJETO</h1>
+            <p id="paywall-desc" style="margin: 15px 0; font-weight: 800;">Ajude o criador a continuar evoluindo o app!</p>
+            <div style="background: #ffeaa7; padding: 15px; border-radius: 15px; border: 3px solid #000; margin-bottom: 10px;">
                 <p>Acesso Vitalício por apenas:</p>
                 <h2 style="font-size: 2rem;">R$ 2,50</h2>
             </div>
-            <button onclick="alert('Redirecionando para pagamento...'); playPop();" class="btn-main" style="background: #55efc4; width: 100%;">PAGAR E LIBERAR AGORA</button>
+            <button onclick="alert('Redirecionando para pagamento...'); playPop();" class="btn-main" style="background: #55efc4; width: 100%;">PAGAR E APOIAR</button>
+            <button id="btn-back-paywall" onclick="closePaywall(); playPop();" class="btn-back">TALVEZ DEPOIS</button>
         </div>
     </div>
 
@@ -197,6 +256,17 @@
     </div>
 
     <div id="main-screen" class="screen">
+        <div class="top-bar">
+            <div class="premium-ad-banner" onclick="openPaywall('ad'); playPop();">
+                <div class="ad-content">
+                    <h4>Ajude o Criador! ❤️</h4>
+                    <p>Mantenha o projeto vivo por apenas R$ 2,50</p>
+                </div>
+                <button class="ad-btn">APOIAR</button>
+            </div>
+            <button id="settings-btn" onclick="toggleSettings(); playPop();">⚙️</button>
+        </div>
+
         <header style="text-align: center; margin: 20px 0;">
             <h2 id="welcome-text"><span id="user-avatar-display">✨</span> MEU DIA <span class="premium-tag">PREMIUM</span></h2>
             <p id="task-count">0 tarefas no radar</p>
@@ -208,10 +278,7 @@
             <input type="time" id="task-time" style="width: 100%;">
             <select id="category-select" onchange="playPop()">
                 <option value="school">📚 ESCOLA</option>
-                <option value="home">🏠 CASA</option>
-                <option value="kitchen">🍳 COZINHA</option>
-                <option value="laundry">🧺 LAVAR ROUPA</option>
-                <option value="sweep">🧹 VARRER</option>
+                <option value="home">🏠 AFAZERES DE CASA</option>
             </select>
             <button id="add-task-btn" onclick="playPop()">ADICIONAR +</button>
         </div>
@@ -220,9 +287,6 @@
             <button class="tab-btn active" data-filter="all">TODAS <span class="count"></span></button>
             <button class="tab-btn" data-filter="school">ESCOLA <span class="count"></span></button>
             <button class="tab-btn" data-filter="home">CASA <span class="count"></span></button>
-            <button class="tab-btn" data-filter="kitchen">COZINHA <span class="count"></span></button>
-            <button class="tab-btn" data-filter="laundry">LAVAR <span class="count"></span></button>
-            <button class="tab-btn" data-filter="sweep">VARRER <span class="count"></span></button>
         </div>
 
         <div id="task-list"></div>
@@ -259,13 +323,71 @@
             osc.stop(audioCtx.currentTime + 0.3);
         }
 
+        // --- SISTEMA DE NOTIFICAÇÃO ---
+        let notifiedTasks = new Set(); // Evita notificar várias vezes o mesmo minuto
+
+        function checkNotifications() {
+            const now = new Date();
+            const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+            
+            tasks.forEach(task => {
+                if (task.time === currentTime && !task.completed && !notifiedTasks.has(task.id)) {
+                    showNotificationAlert(task.text);
+                    notifiedTasks.add(task.id);
+                }
+            });
+
+            // Limpa o Set no início de cada novo minuto para permitir futuras tarefas se necessário
+            if (now.getSeconds() === 0) notifiedTasks.clear();
+        }
+
+        function showNotificationAlert(taskName) {
+            const popup = document.getElementById('alert-popup');
+            const nameSpan = document.getElementById('alert-task-name');
+            nameSpan.innerText = taskName;
+            popup.style.display = 'block';
+            playDing();
+            
+            setTimeout(() => {
+                popup.style.display = 'none';
+            }, 5000); // Some depois de 5 segundos
+        }
+
+        // Verifica a cada 1 segundo se há tarefas no horário
+        setInterval(checkNotifications, 1000);
+
         const TRIAL_DAYS = 3;
         let installDate = localStorage.getItem('eduDomus_install_date');
         let selectedAvatar = localStorage.getItem('eduDomus_avatar') || '✨';
+        let trialExpired = false;
 
         if (!installDate) {
             installDate = new Date().getTime();
             localStorage.setItem('eduDomus_install_date', installDate);
+        }
+
+        function openPaywall(reason) {
+            const paywall = document.getElementById('paywall-screen');
+            const btnBack = document.getElementById('btn-back-paywall');
+            const title = document.getElementById('paywall-title');
+            const desc = document.getElementById('paywall-desc');
+
+            if (trialExpired) {
+                title.innerText = "🛑 OPS!";
+                desc.innerText = "Seu teste grátis de 3 dias acabou.";
+                btnBack.style.display = 'none';
+            } else {
+                title.innerText = "APOIAR PROJETO";
+                desc.innerText = "Ajude o criador a continuar evoluindo o app!";
+                btnBack.style.display = 'block';
+            }
+            paywall.style.display = 'flex';
+        }
+
+        function closePaywall() {
+            if (!trialExpired) {
+                document.getElementById('paywall-screen').style.display = 'none';
+            }
         }
 
         function toggleSettings() {
@@ -299,8 +421,10 @@
             const diffInDays = (now - installDate) / (1000 * 3600 * 24);
             const daysLeft = Math.ceil(TRIAL_DAYS - diffInDays);
             applySettings();
+            
             if (diffInDays >= TRIAL_DAYS) {
-                document.getElementById('paywall-screen').style.display = 'flex';
+                trialExpired = true;
+                openPaywall();
             } else {
                 document.getElementById('initial-trial-screen').style.display = 'flex';
                 document.getElementById('trial-info').innerText = `Você tem ${daysLeft} ${daysLeft > 1 ? 'dias' : 'dia'} de teste grátis!`;
@@ -370,7 +494,6 @@
             const now = new Date();
             const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
             
-            // ATUALIZA NÚMEROS NOS BOTÕES
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 const btnFilter = btn.dataset.filter;
                 const count = btnFilter === 'all' ? tasks.length : tasks.filter(t => t.category === btnFilter).length;
