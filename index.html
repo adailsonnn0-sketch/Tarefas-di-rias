@@ -222,6 +222,20 @@
             z-index: 50000; display: none; box-shadow: 0 10px 0px #000;
             text-align: center;
         }
+        
+        /* Estilo para o campo de código promocional */
+        .promo-container {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 2px dashed #000;
+        }
+        .promo-input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            text-align: center;
+            text-transform: uppercase;
+        }
     </style>
 </head>
 <body>
@@ -302,6 +316,12 @@
                 <h2 style="font-size: 2rem;">R$ 2,50</h2>
             </div>
             <button onclick="simulatePayment(); playPop();" class="btn-main" style="background: #55efc4; width: 100%;">PAGAR E APOIAR</button>
+            
+            <div class="promo-container">
+                <input type="text" id="promo-code-input" class="promo-input" placeholder="POSSUI UM CÓDIGO?">
+                <button onclick="checkPromoCode(); playPop();" class="btn-main" style="background: #a29bfe; width: 100%; font-size: 0.8rem; padding: 10px;">RESGATAR CÓDIGO</button>
+            </div>
+
             <button id="btn-back-paywall" onclick="closePaywall(); playPop();" class="btn-back">TALVEZ DEPOIS</button>
         </div>
     </div>
@@ -382,8 +402,25 @@
             else selectAvatar(icon, el);
         }
 
+        // Lógica do Código Promocional
+        function checkPromoCode() {
+            const input = document.getElementById('promo-code-input');
+            const code = input.value.trim().toUpperCase();
+            
+            if (code === "SANTOS2026") {
+                alert("🎉 CÓDIGO ACEITO! Você desbloqueou o Organize Já Premium!");
+                activatePremium();
+            } else {
+                alert("❌ Código inválido. Tente novamente!");
+            }
+        }
+
         function simulatePayment() {
             alert('Pagamento simulado com sucesso! Você agora é PREMIUM! ✨');
+            activatePremium();
+        }
+
+        function activatePremium() {
             isUserPremium = true;
             localStorage.setItem('organizeJa_isPremium', 'true');
             unlockPremiumFeatures();
@@ -392,9 +429,10 @@
 
         function unlockPremiumFeatures() {
             const timeInput = document.getElementById('task-time');
-            timeInput.classList.remove('premium-lock-input');
+            if(timeInput) timeInput.classList.remove('premium-lock-input');
             document.querySelectorAll('.locked-avatar').forEach(el => el.classList.remove('locked-avatar'));
-            document.getElementById('premium-badge-text').style.display = 'inline-block';
+            const badge = document.getElementById('premium-badge-text');
+            if(badge) badge.style.display = 'inline-block';
         }
 
         let currentAd = 0;
@@ -577,7 +615,6 @@
 
             const now = new Date().getTime();
             const diffInDays = (now - installDate) / (1000 * 3600 * 24);
-            const daysLeft = Math.ceil(TRIAL_DAYS - diffInDays);
             applySettings();
             
             if (diffInDays >= TRIAL_DAYS && !isUserPremium) {
@@ -613,7 +650,6 @@
             const time = taskTime.value;
             if (text === "") return;
 
-            // Bloqueio final no botão caso tente burlar
             if (time !== "" && !isUserPremium && getTimedTasksCount() >= MAX_FREE_TIME_TASKS) {
                 alert("Lembrete com hora bloqueado! Use o Premium.");
                 openPaywall();
