@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EduDomus Cartoon Premium</title>
+    <title>Organize Já Cartoon Premium</title>
     <style>
         :root {
             --primary: #6c5ce7;
@@ -15,6 +15,14 @@
             --home-color: #55efc4;
             --danger: #ff4757;
             --border-width: 3px;
+            --card-bg: #ffffff;
+        }
+
+        body.dark-mode {
+            --bg: #2d3436;
+            --text: #fdfdfd;
+            --white: #353b48;
+            --card-bg: #4b4b4b;
         }
 
         * {
@@ -23,7 +31,7 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        body { background-color: var(--bg); color: var(--text); overflow-x: hidden; padding-bottom: 50px; }
+        body { background-color: var(--bg); color: var(--text); transition: background 0.3s ease; overflow-x: hidden; padding-bottom: 50px; }
 
         .screen { padding: 20px; display: none; animation: bounceIn 0.6s ease; }
         .screen.active { display: block; }
@@ -33,7 +41,20 @@
             100% { opacity: 1; transform: scale(1); }
         }
 
-        /* --- LAYOUT DO TOPO --- */
+        #auth-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--primary); z-index: 40000;
+            display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px;
+        }
+
+        .auth-card {
+            background: white; border: 4px solid #000; padding: 25px;
+            border-radius: 30px; box-shadow: 10px 10px 0px #000; width: 100%; max-width: 350px;
+            color: #2d3436;
+        }
+
+        .auth-card h2 { text-align: center; margin-bottom: 20px; text-transform: uppercase; }
+
         .top-bar {
             display: flex;
             align-items: center;
@@ -42,7 +63,6 @@
             margin-top: 10px;
         }
 
-        /* --- ANÚNCIO PREMIUM --- */
         .premium-ad-banner {
             background: linear-gradient(-45deg, #6c5ce7, #a29bfe, #fd79a8, #6c5ce7);
             background-size: 400% 400%;
@@ -85,7 +105,6 @@
             100% { transform: scale(1); }
         }
 
-        /* --- CONFIGURAÇÕES --- */
         #settings-btn {
             background: var(--white); 
             border: 3px solid #000; 
@@ -99,6 +118,7 @@
             justify-content: center;
             box-shadow: 0 5px 0 #000;
             flex-shrink: 0;
+            color: var(--text);
         }
 
         #settings-panel {
@@ -106,27 +126,27 @@
             background: var(--white); z-index: 10002; border-left: 5px solid #000;
             padding: 30px; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             display: flex; flex-direction: column; gap: 20px;
+            overflow-y: auto;
         }
 
         #settings-panel.open { right: 0; }
 
-        .avatar-grid { display: flex; gap: 10px; justify-content: center; margin: 10px 0; }
+        .avatar-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; justify-content: center; margin: 10px 0; }
         .avatar-opt { 
-            font-size: 30px; padding: 10px; border: 2px solid transparent; 
-            border-radius: 15px; cursor: pointer; 
+            font-size: 24px; padding: 8px; border: 2px solid transparent; 
+            border-radius: 15px; cursor: pointer; text-align: center;
         }
-        .avatar-opt.selected { border-color: var(--primary); background: #eee; }
+        .avatar-opt.selected { border-color: var(--primary); background: rgba(108, 92, 231, 0.2); }
 
-        /* --- TELAS DE TRAVA E SPLASH --- */
-        #initial-trial-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #a29bfe; z-index: 10001;
-            display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px;
+        .theme-switch {
+            display: flex; align-items: center; justify-content: space-between;
+            background: rgba(0,0,0,0.05); padding: 15px; border-radius: 20px; border: 2px solid #000;
         }
 
         .pay-card {
             background: white; border: 4px solid #000; padding: 30px;
             border-radius: 30px; box-shadow: 10px 10px 0px #000;
+            color: #2d3436;
         }
 
         #paywall-screen {
@@ -152,7 +172,7 @@
         input, select {
             padding: 18px; border: var(--border-width) solid var(--text);
             border-radius: 20px; font-weight: bold; background: var(--white);
-            font-size: 1rem; outline: none;
+            font-size: 1rem; outline: none; color: var(--text);
         }
 
         .btn-main, #add-task-btn {
@@ -170,7 +190,7 @@
         .filter-tabs { display: flex; gap: 12px; margin-bottom: 30px; overflow-x: auto; padding: 5px 5px 15px 5px; scrollbar-width: none; }
         .tab-btn {
             flex: 0 0 auto; padding: 12px 20px; border: var(--border-width) solid var(--text);
-            border-radius: 18px; background: var(--white); font-weight: 800; text-transform: uppercase; font-size: 0.8rem;
+            border-radius: 18px; background: var(--white); color: var(--text); font-weight: 800; text-transform: uppercase; font-size: 0.8rem;
         }
         .tab-btn.active { background: var(--secondary); color: white; box-shadow: 0 4px 0 var(--text); }
 
@@ -181,11 +201,14 @@
             box-shadow: 5px 5px 0px var(--text);
         }
         .late { background: #ffebeb; border-color: var(--danger); }
+        body.dark-mode .late { background: #633b3b; }
+
         .task-info { display: flex; align-items: center; gap: 15px; flex: 1; font-weight: bold; }
         .category-dot { width: 20px; height: 20px; border-radius: 6px; border: 2px solid var(--text); }
         .dot-school { background: var(--school-color); }
         .dot-home { background: var(--home-color); }
         .completed { background: #eee !important; opacity: 0.6; }
+        body.dark-mode .completed { background: #2d3436 !important; }
         .completed span { text-decoration: line-through; }
         .delete-btn { background: var(--secondary); color: white; border: 2px solid var(--text); padding: 8px 12px; border-radius: 10px; font-weight: bold; }
 
@@ -193,7 +216,7 @@
             position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
             background: var(--danger); color: white; padding: 15px 25px;
             border-radius: 20px; border: 3px solid #000; font-weight: 900;
-            z-index: 30000; display: none; box-shadow: 0 10px 0px #000;
+            z-index: 50000; display: none; box-shadow: 0 10px 0px #000;
             text-align: center;
         }
     </style>
@@ -202,34 +225,51 @@
 
     <div id="alert-popup">🔔 HORA DA TAREFA!<br><span id="alert-task-name" style="font-size: 0.8rem; opacity: 0.9;"></span></div>
 
+    <div id="auth-screen">
+        <div class="auth-card">
+            <h2 id="auth-title">CRIAR CONTA 📝</h2>
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+                <input type="email" id="auth-email" placeholder="Seu E-mail">
+                <input type="password" id="auth-pass" placeholder="Sua Senha">
+                <button onclick="handleAuth(); playPop();" class="btn-main" id="auth-btn">CADASTRAR</button>
+                <p onclick="toggleAuthMode()" id="auth-switch" style="text-align: center; font-size: 0.7rem; cursor: pointer; text-decoration: underline;">Já tenho uma conta</p>
+            </div>
+        </div>
+    </div>
+
     <div id="settings-panel">
         <h2 style="text-align: center;">AJUSTES 🛠️</h2>
         <hr border="1">
+        
+        <div class="theme-switch">
+            <label style="font-weight: 900;">MODO ESCURO</label>
+            <input type="checkbox" id="dark-mode-toggle" onchange="toggleDarkMode(); playPop();" style="width: 25px; height: 25px;">
+        </div>
+
         <div>
             <label style="font-weight: 900;">MEU NOME:</label>
             <input type="text" id="user-name-input" placeholder="Seu nome aqui" style="width: 100%; margin-top: 10px;">
         </div>
+        
         <div>
             <label style="font-weight: 900;">AVATAR:</label>
             <div class="avatar-grid">
                 <span class="avatar-opt" onclick="selectAvatar('🐱', this); playPop();">🐱</span>
                 <span class="avatar-opt" onclick="selectAvatar('🐶', this); playPop();">🐶</span>
-                <span class="avatar-opt" onclick="selectAvatar('🦊', this); playPop();">🦊</span>
+                <span class="avatar-opt" onclick="selectAvatar(' foxes', this); playPop();">🦊</span>
                 <span class="avatar-opt" onclick="selectAvatar('🦄', this); playPop();">🦄</span>
+                <span class="avatar-opt" onclick="selectAvatar('🐸', this); playPop();">🐸</span>
+                <span class="avatar-opt" onclick="selectAvatar('🐼', this); playPop();">🐼</span>
+                <span class="avatar-opt" onclick="selectAvatar('🦁', this); playPop();">🦁</span>
+                <span class="avatar-opt" onclick="selectAvatar('🐷', this); playPop();">🐷</span>
+                <span class="avatar-opt" onclick="selectAvatar('🤖', this); playPop();">🤖</span>
+                <span class="avatar-opt" onclick="selectAvatar('🐙', this); playPop();">🐙</span>
             </div>
         </div>
         <div style="margin-top: auto;">
             <button onclick="saveSettings(); playPop();" class="btn-main" style="width: 100%; background: var(--home-color);">SALVAR</button>
             <button onclick="toggleSettings(); playPop();" class="btn-main" style="width: 100%; background: var(--secondary); margin-top: 10px; font-size: 0.8rem; padding: 10px;">FECHAR</button>
-        </div>
-    </div>
-
-    <div id="initial-trial-screen">
-        <div class="pay-card" style="max-width: 320px;">
-            <span style="font-size: 50px;">🎁</span>
-            <h2 style="margin: 10px 0;">AVISO PREMIUM</h2>
-            <p style="margin-bottom: 20px; font-weight: 800;">Você ganhou <b>3 DIAS</b> de acesso gratuito para testar todas as funções!</p>
-            <button onclick="startTrialFlow(); playPop();" class="btn-main" style="width: 100%; background: #55efc4;">INICIAR MEU TESTE</button>
+            <button onclick="logout();" style="width: 100%; margin-top: 10px; border: none; background: none; font-size: 0.7rem; cursor: pointer; color: var(--text);">Sair da Conta</button>
         </div>
     </div>
 
@@ -246,10 +286,10 @@
         </div>
     </div>
 
-    <div id="splash-screen" class="screen" style="background:#ffeaa7; height:100vh; display:none; flex-direction:column; justify-content:center; align-items:center;">
+    <div id="splash-screen" class="screen" style="background:#ffeaa7; height:100vh; display:none; flex-direction:column; justify-content:center; align-items:center; color: #2d3436;">
         <div class="logo-container" style="text-align: center;">
             <span style="font-size: 80px;">🚀</span>
-            <h1>EduDomus</h1>
+            <h1>Organize Já</h1>
         </div>
         <p id="trial-info" style="margin: 20px 0; font-weight: bold; color: #d63031;"></p>
         <button id="btn-start" class="btn-main" style="padding: 15px 60px;" onclick="playPop()">ENTRAR</button>
@@ -323,77 +363,108 @@
             osc.stop(audioCtx.currentTime + 0.3);
         }
 
-        // --- SISTEMA DE NOTIFICAÇÃO ---
-        let notifiedTasks = new Set(); // Evita notificar várias vezes o mesmo minuto
+        function toggleDarkMode() {
+            const isDark = document.getElementById('dark-mode-toggle').checked;
+            if(isDark) {
+                document.body.classList.add('dark-mode');
+                localStorage.setItem('organizeJa_theme', 'dark');
+            } else {
+                document.body.classList.remove('dark-mode');
+                localStorage.setItem('organizeJa_theme', 'light');
+            }
+        }
 
+        let authMode = 'signup';
+        function toggleAuthMode() {
+            authMode = authMode === 'signup' ? 'login' : 'signup';
+            document.getElementById('auth-title').innerText = authMode === 'signup' ? 'CRIAR CONTA 📝' : 'ENTRAR 👋';
+            document.getElementById('auth-btn').innerText = authMode === 'signup' ? 'CADASTRAR' : 'LOGIN';
+            document.getElementById('auth-switch').innerText = authMode === 'signup' ? 'Já tenho uma conta' : 'Não tenho conta';
+        }
+
+        function handleAuth() {
+            const email = document.getElementById('auth-email').value;
+            const pass = document.getElementById('auth-pass').value;
+            if(!email || !pass) return alert("Preencha tudo!");
+
+            if(authMode === 'signup') {
+                localStorage.setItem(`user_${email}`, JSON.stringify({pass: pass, premium: false}));
+                alert("Conta criada com sucesso!");
+                loginUser(email);
+            } else {
+                const user = JSON.parse(localStorage.getItem(`user_${email}`));
+                if(user && user.pass === pass) {
+                    loginUser(email);
+                } else {
+                    alert("E-mail ou senha incorretos!");
+                }
+            }
+        }
+
+        function loginUser(email) {
+            localStorage.setItem('loggedUser', email);
+            document.getElementById('auth-screen').style.display = 'none';
+            initApp();
+        }
+
+        function logout() {
+            localStorage.removeItem('loggedUser');
+            location.reload();
+        }
+
+        let notifiedTasks = new Set(); 
         function checkNotifications() {
             const now = new Date();
             const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-            
             tasks.forEach(task => {
                 if (task.time === currentTime && !task.completed && !notifiedTasks.has(task.id)) {
                     showNotificationAlert(task.text);
                     notifiedTasks.add(task.id);
                 }
             });
-
-            // Limpa o Set no início de cada novo minuto para permitir futuras tarefas se necessário
             if (now.getSeconds() === 0) notifiedTasks.clear();
         }
 
         function showNotificationAlert(taskName) {
             const popup = document.getElementById('alert-popup');
-            const nameSpan = document.getElementById('alert-task-name');
-            nameSpan.innerText = taskName;
+            document.getElementById('alert-task-name').innerText = taskName;
             popup.style.display = 'block';
             playDing();
-            
-            setTimeout(() => {
-                popup.style.display = 'none';
-            }, 5000); // Some depois de 5 segundos
+            setTimeout(() => popup.style.display = 'none', 5000);
         }
-
-        // Verifica a cada 1 segundo se há tarefas no horário
         setInterval(checkNotifications, 1000);
 
         const TRIAL_DAYS = 3;
-        let installDate = localStorage.getItem('eduDomus_install_date');
-        let selectedAvatar = localStorage.getItem('eduDomus_avatar') || '✨';
+        let installDate = localStorage.getItem('organizeJa_install_date');
+        let selectedAvatar = localStorage.getItem('organizeJa_avatar') || '✨';
         let trialExpired = false;
 
         if (!installDate) {
             installDate = new Date().getTime();
-            localStorage.setItem('eduDomus_install_date', installDate);
+            localStorage.setItem('organizeJa_install_date', installDate);
         }
 
-        function openPaywall(reason) {
+        function openPaywall() {
             const paywall = document.getElementById('paywall-screen');
             const btnBack = document.getElementById('btn-back-paywall');
-            const title = document.getElementById('paywall-title');
-            const desc = document.getElementById('paywall-desc');
-
             if (trialExpired) {
-                title.innerText = "🛑 OPS!";
-                desc.innerText = "Seu teste grátis de 3 dias acabou.";
+                document.getElementById('paywall-title').innerText = "🛑 OPS!";
+                document.getElementById('paywall-desc').innerText = "Seu teste grátis de 3 dias acabou.";
                 btnBack.style.display = 'none';
             } else {
-                title.innerText = "APOIAR PROJETO";
-                desc.innerText = "Ajude o criador a continuar evoluindo o app!";
+                document.getElementById('paywall-title').innerText = "APOIAR PROJETO";
+                document.getElementById('paywall-desc').innerText = "Ajude o criador a continuar evoluindo o app!";
                 btnBack.style.display = 'block';
             }
             paywall.style.display = 'flex';
         }
 
         function closePaywall() {
-            if (!trialExpired) {
-                document.getElementById('paywall-screen').style.display = 'none';
-            }
+            if (!trialExpired) document.getElementById('paywall-screen').style.display = 'none';
         }
 
-        function toggleSettings() {
-            document.getElementById('settings-panel').classList.toggle('open');
-        }
-
+        function toggleSettings() { document.getElementById('settings-panel').classList.toggle('open'); }
+        
         function selectAvatar(icon, el) {
             selectedAvatar = icon;
             document.querySelectorAll('.avatar-opt').forEach(opt => opt.classList.remove('selected'));
@@ -402,21 +473,39 @@
 
         function saveSettings() {
             const name = document.getElementById('user-name-input').value;
-            localStorage.setItem('eduDomus_user_name', name);
-            localStorage.setItem('eduDomus_avatar', selectedAvatar);
+            localStorage.setItem('organizeJa_user_name', name);
+            localStorage.setItem('organizeJa_avatar', selectedAvatar);
             applySettings();
             toggleSettings();
         }
 
         function applySettings() {
-            const name = localStorage.getItem('eduDomus_user_name') || '';
-            const avatar = localStorage.getItem('eduDomus_avatar') || '✨';
+            const name = localStorage.getItem('organizeJa_user_name') || '';
+            const avatar = localStorage.getItem('organizeJa_avatar') || '✨';
+            const theme = localStorage.getItem('organizeJa_theme');
+
             document.getElementById('user-name-display').innerText = name ? `Olá, ${name}!` : '';
             document.getElementById('user-avatar-display').innerText = avatar;
             document.getElementById('user-name-input').value = name;
+            
+            document.querySelectorAll('.avatar-opt').forEach(opt => {
+                if(opt.innerText === avatar) opt.classList.add('selected');
+            });
+
+            if(theme === 'dark') {
+                document.body.classList.add('dark-mode');
+                document.getElementById('dark-mode-toggle').checked = true;
+            }
         }
 
         function initApp() {
+            const currentUser = localStorage.getItem('loggedUser');
+            if(!currentUser) {
+                document.getElementById('auth-screen').style.display = 'flex';
+                return;
+            }
+            document.getElementById('auth-screen').style.display = 'none';
+
             const now = new Date().getTime();
             const diffInDays = (now - installDate) / (1000 * 3600 * 24);
             const daysLeft = Math.ceil(TRIAL_DAYS - diffInDays);
@@ -426,20 +515,14 @@
                 trialExpired = true;
                 openPaywall();
             } else {
-                document.getElementById('initial-trial-screen').style.display = 'flex';
+                document.getElementById('splash-screen').style.display = 'flex';
                 document.getElementById('trial-info').innerText = `Você tem ${daysLeft} ${daysLeft > 1 ? 'dias' : 'dia'} de teste grátis!`;
             }
         }
 
-        function startTrialFlow() {
-            document.getElementById('initial-trial-screen').style.display = 'none';
-            document.getElementById('splash-screen').style.display = 'flex';
-            document.getElementById('splash-screen').classList.add('active');
-        }
+        window.onload = initApp;
 
-        initApp();
-
-        let tasks = JSON.parse(localStorage.getItem('eduDomus_v_final')) || [];
+        let tasks = JSON.parse(localStorage.getItem('organizeJa_v_final')) || [];
         const splash = document.getElementById('splash-screen');
         const main = document.getElementById('main-screen');
         const btnStart = document.getElementById('btn-start');
@@ -448,7 +531,6 @@
         const taskTime = document.getElementById('task-time');
         const categorySelect = document.getElementById('category-select');
         const taskList = document.getElementById('task-list');
-        const taskCountText = document.getElementById('task-count');
 
         btnStart.onclick = () => {
             playPop();
@@ -462,15 +544,8 @@
             playPop();
             const text = taskInput.value.trim();
             if (text === "") return;
-            tasks.push({
-                id: Date.now(),
-                text: text,
-                time: taskTime.value,
-                category: categorySelect.value,
-                completed: false
-            });
-            taskInput.value = "";
-            taskTime.value = "";
+            tasks.push({ id: Date.now(), text: text, time: taskTime.value, category: categorySelect.value, completed: false });
+            taskInput.value = ""; taskTime.value = "";
             render(document.querySelector('.tab-btn.active').dataset.filter);
         };
 
@@ -482,9 +557,7 @@
 
         window.toggleTask = (id) => {
             const task = tasks.find(t => t.id === id);
-            if(task && !task.completed) playDing();
-            else playPop();
-            
+            if(task && !task.completed) playDing(); else playPop();
             tasks = tasks.map(t => t.id === id ? {...t, completed: !t.completed} : t);
             render(document.querySelector('.tab-btn.active').dataset.filter);
         };
@@ -501,7 +574,6 @@
             });
 
             const filtered = filter === 'all' ? tasks : tasks.filter(t => t.category === filter);
-
             filtered.forEach(task => {
                 const isLate = task.time && task.time < currentTime && !task.completed;
                 const div = document.createElement('div');
@@ -509,17 +581,14 @@
                 div.innerHTML = `
                     <div class="task-info" onclick="toggleTask(${task.id})">
                         <div class="category-dot dot-${task.category}"></div>
-                        <div>
-                            <span>${task.text}</span>
-                            ${task.time ? `<br><small style="color:#666">⏰ ${task.time}</small>` : ''}
-                        </div>
+                        <div><span>${task.text}</span>${task.time ? `<br><small style="opacity:0.7">⏰ ${task.time}</small>` : ''}</div>
                     </div>
                     <button class="delete-btn" onclick="deleteTask(${task.id})">X</button>
                 `;
                 taskList.appendChild(div);
             });
-            taskCountText.innerText = `${tasks.length} tarefas`;
-            localStorage.setItem('eduDomus_v_final', JSON.stringify(tasks));
+            document.getElementById('task-count').innerText = `${tasks.length} tarefas`;
+            localStorage.setItem('organizeJa_v_final', JSON.stringify(tasks));
         }
 
         document.querySelectorAll('.tab-btn').forEach(btn => {
