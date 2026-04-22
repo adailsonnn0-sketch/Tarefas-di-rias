@@ -223,7 +223,6 @@
             text-align: center;
         }
         
-        /* Estilo para o campo de código promocional */
         .promo-container {
             margin-top: 20px;
             padding-top: 15px;
@@ -315,7 +314,8 @@
                 <p>Acesso Vitalício por apenas:</p>
                 <h2 style="font-size: 2rem;">R$ 2,50</h2>
             </div>
-            <button onclick="simulatePayment(); playPop();" class="btn-main" style="background: #55efc4; width: 100%;">PAGAR E APOIAR</button>
+            
+            <button onclick="copyPixCode(); playPop();" class="btn-main" style="background: #55efc4; width: 100%;">PAGAR E APOIAR</button>
             
             <div class="promo-container">
                 <input type="text" id="promo-code-input" class="promo-input" placeholder="POSSUI UM CÓDIGO?">
@@ -377,8 +377,18 @@
         let isUserPremium = false;
         let tasks = JSON.parse(localStorage.getItem('organizeJa_v_final')) || [];
 
-        // --- Lógica de bloqueio e Limites ---
         const MAX_FREE_TIME_TASKS = 5;
+
+        // FUNÇÃO PARA COPIAR O CÓDIGO PIX
+        function copyPixCode() {
+            const pixCode = "00020126580014BR.GOV.BCB.PIX013669807f54-b327-49be-9a2e-4352460d0f3052040000530398654042.505802BR5925Adailson Nascimento Neves6009SAO PAULO62140510U7XtHeXG006304FBF2";
+            
+            navigator.clipboard.writeText(pixCode).then(() => {
+                alert("✅ Código PIX Copiado! \n\nCole no seu banco para fazer o pagamento. Após o pagamento, use o código SANTOS2026 para liberar agora mesmo!");
+            }).catch(err => {
+                alert("Erro ao copiar: " + err);
+            });
+        }
 
         function getTimedTasksCount() {
             return tasks.filter(t => t.time && t.time !== "").length;
@@ -386,7 +396,6 @@
 
         function handleTimeClick() {
             if (isUserPremium) return;
-
             const count = getTimedTasksCount();
             if (count >= MAX_FREE_TIME_TASKS) {
                 alert("🛑 Limite atingido! Você já usou seus 5 lembretes com hora gratuitos. Mude para o Premium para usar sem limites!");
@@ -402,22 +411,15 @@
             else selectAvatar(icon, el);
         }
 
-        // Lógica do Código Promocional
         function checkPromoCode() {
             const input = document.getElementById('promo-code-input');
             const code = input.value.trim().toUpperCase();
-            
             if (code === "SANTOS2026") {
                 alert("🎉 CÓDIGO ACEITO! Você desbloqueou o Organize Já Premium!");
                 activatePremium();
             } else {
                 alert("❌ Código inválido. Tente novamente!");
             }
-        }
-
-        function simulatePayment() {
-            alert('Pagamento simulado com sucesso! Você agora é PREMIUM! ✨');
-            activatePremium();
         }
 
         function activatePremium() {
@@ -586,17 +588,13 @@
             const avatar = localStorage.getItem('organizeJa_avatar') || '✨';
             const theme = localStorage.getItem('organizeJa_theme');
             isUserPremium = localStorage.getItem('organizeJa_isPremium') === 'true';
-
             if(isUserPremium) unlockPremiumFeatures();
-
             document.getElementById('user-name-display').innerText = name ? `Olá, ${name}!` : '';
             document.getElementById('user-avatar-display').innerText = avatar;
             document.getElementById('user-name-input').value = name;
-            
             document.querySelectorAll('.avatar-opt').forEach(opt => {
                 if(opt.innerText === avatar) opt.classList.add('selected');
             });
-
             if(theme === 'dark') {
                 document.body.classList.add('dark-mode');
                 document.getElementById('dark-mode-toggle').checked = true;
@@ -612,11 +610,9 @@
             document.getElementById('auth-screen').style.display = 'none';
             document.getElementById('ad-footer').style.display = 'flex';
             startAdRotation();
-
             const now = new Date().getTime();
             const diffInDays = (now - installDate) / (1000 * 3600 * 24);
             applySettings();
-            
             if (diffInDays >= TRIAL_DAYS && !isUserPremium) {
                 trialExpired = true;
                 openPaywall();
@@ -649,13 +645,11 @@
             const text = taskInput.value.trim();
             const time = taskTime.value;
             if (text === "") return;
-
             if (time !== "" && !isUserPremium && getTimedTasksCount() >= MAX_FREE_TIME_TASKS) {
                 alert("Lembrete com hora bloqueado! Use o Premium.");
                 openPaywall();
                 return;
             }
-
             tasks.push({ id: Date.now(), text: text, time: time, category: categorySelect.value, completed: false });
             taskInput.value = ""; taskTime.value = "";
             render(document.querySelector('.tab-btn.active').dataset.filter);
@@ -678,13 +672,11 @@
             taskList.innerHTML = '';
             const now = new Date();
             const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-            
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 const btnFilter = btn.dataset.filter;
                 const count = btnFilter === 'all' ? tasks.length : tasks.filter(t => t.category === btnFilter).length;
                 btn.querySelector('.count').innerText = `(${count})`;
             });
-
             const filtered = filter === 'all' ? tasks : tasks.filter(t => t.category === filter);
             filtered.forEach(task => {
                 const isLate = task.time && task.time < currentTime && !task.completed;
